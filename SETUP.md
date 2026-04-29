@@ -35,7 +35,7 @@ Open Terminal and run:
 
 ```bash
 cd ~/Projects
-git clone https://github.com/YOUR_ORG/twenty-crm-mcp-server.git
+git clone https://github.com/cto-ms/twenty-crm-mcp-server.git
 cd twenty-crm-mcp-server
 npm install
 ```

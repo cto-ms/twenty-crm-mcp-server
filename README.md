@@ -33,7 +33,7 @@ Plus the original 20 community tools: full CRUD for People, Companies, Tasks, No
 Quick version:
 
 ```bash
-git clone https://github.com/YOUR_ORG/twenty-crm-mcp-server.git
+git clone https://github.com/cto-ms/twenty-crm-mcp-server.git
 cd twenty-crm-mcp-server
 npm install
 ```
