@@ -1,13 +1,13 @@
 {
   "name": "twenty-crm-mcp-server",
-  "version": "1.0.0",
-  "description": "A Model Context Protocol (MCP) server for Twenty CRM integration. Enables natural language interactions with your CRM data through Claude and other AI assistants.",
+  "version": "2.0.0",
+  "description": "Twenty CRM MCP server with Kurlan baseball diamond methodology and Rosen L.E.A.D.S. coaching. Fork of mhenry3164/twenty-crm-mcp-server.",
   "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "node --inspect index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test-tools.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.6.0"

@@ -1,281 +1,108 @@
-<div align="center">
+# Twenty CRM MCP Server — TruePresence Fork
 
-# 🤖 Twenty CRM MCP Server
+MCP server for [Twenty CRM](https://twenty.com) with Kurlan baseball diamond methodology and Rosen L.E.A.D.S. coaching built in. Connects your CRM to Claude Desktop so you can manage pipeline, enforce stage gates, and coach deals through natural language.
 
-**Transform your CRM into an AI-powered assistant**
+Based on [mhenry3164/twenty-crm-mcp-server](https://github.com/mhenry3164/twenty-crm-mcp-server) (MIT License).
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18-brightgreen)](https://nodejs.org/)
-[![Twenty CRM](https://img.shields.io/badge/Twenty_CRM-Compatible-blue)](https://twenty.com)
-[![MCP](https://img.shields.io/badge/MCP-Compatible-purple)](https://modelcontextprotocol.io/)
+## What's Added
 
-*A Model Context Protocol server that connects [Twenty CRM](https://twenty.com) with Claude and other AI assistants, enabling natural language interactions with your customer data.*
+Six custom tools on top of the community CRUD operations:
 
-[🚀 Quick Start](#-installation) • [📖 Usage Examples](#-usage) • [🛠️ API Reference](#-api-reference) • [🤝 Contributing](#-contributing)
+| Tool | What it does |
+|------|-------------|
+| `get_pipeline_health` | Scans all opportunities. Flags Happy Ears (stage advanced without qualification), Stalls (no activity in N days), Blue Real Estate (compelling reason but no monetized pain). |
+| `validate_stage_advance` | Stage-gate enforcement. Checks all required fields before advancing to the next base. Dry-run by default; `force=true` advances anyway and sets a Stage Violation Flag with audit trail. |
+| `coach_opportunity_debrief` | Pulls deal data, stakeholders, and activity history. Generates L.E.A.D.S. coaching questions (Listen, Empathize, Ask, Discuss, Support) based on actual qualification gaps. |
+| `generate_coaching_artifact` | Same analysis as the debrief but outputs a styled HTML report with diamond position SVG, qualification heatmap, stakeholder table, and coaching questions. |
+| `bulk_field_update` | Batch-update a field across opportunities matching filters (stage, stall days, company, amount). Dry-run by default. |
+| `add_schema_field` | Add custom fields to any CRM object via the metadata API. No Settings UI needed. |
 
-</div>
+Plus the original 20 community tools: full CRUD for People, Companies, Tasks, Notes, metadata discovery, and cross-object search.
 
----
+## Prerequisites
 
-## ✨ Features
+- Node.js 18+
+- Access to the TruePresence Twenty CRM instance (crm.truepresence.com)
+- Claude Desktop installed
+- A Twenty CRM API key (get one from Settings > API & Webhooks in the CRM)
 
-<table>
-<tr>
-<td width="50%">
+## Setup
 
-### 🔄 **Complete CRUD Operations**
-Create, read, update, and delete people, companies, tasks, and notes with simple commands
+**See [SETUP.md](SETUP.md) for step-by-step employee deployment instructions.**
 
-### 🧠 **Dynamic Schema Discovery** 
-Automatically adapts to your Twenty CRM configuration and custom fields
+Quick version:
 
-### 🔍 **Advanced Search**
-Search across multiple object types with intelligent filtering and natural language queries
-
-</td>
-<td width="50%">
-
-### 📊 **Metadata Access**
-Retrieve schema information and field definitions dynamically
-
-### 💬 **Natural Language Interface**
-Use conversational commands to manage your CRM data effortlessly
-
-### ⚡ **Real-time Updates**
-All changes sync immediately with your Twenty CRM instance
-
-</td>
-</tr>
-</table>
-
----
-
-## 🚀 Installation
-
-### Prerequisites
-
-- Node.js 18 or higher
-- A Twenty CRM instance (cloud or self-hosted)
-- Claude Desktop or compatible MCP client
-
-### Setup
-
-1. **Clone the repository**:
 ```bash
-git clone https://github.com/mhenry3164/twenty-crm-mcp-server.git
+git clone https://github.com/YOUR_ORG/twenty-crm-mcp-server.git
 cd twenty-crm-mcp-server
-```
-
-2. **Install dependencies**:
-```bash
 npm install
 ```
 
-3. **Get your Twenty CRM API key**:
-   - Log in to your Twenty CRM workspace
-   - Navigate to Settings → API & Webhooks (under Developers)
-   - Generate a new API key
-
-4. **Configure Claude Desktop**:
-
-Add the server to your `claude_desktop_config.json`:
+Add to Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on Mac):
 
 ```json
 {
   "mcpServers": {
     "twenty-crm": {
       "command": "node",
-      "args": ["/path/to/twenty-crm-mcp-server/index.js"],
+      "args": ["/full/path/to/twenty-crm-mcp-server/index.js"],
       "env": {
         "TWENTY_API_KEY": "your_api_key_here",
-        "TWENTY_BASE_URL": "https://api.twenty.com"
+        "TWENTY_BASE_URL": "https://crm.truepresence.com"
       }
     }
   }
 }
 ```
 
-For self-hosted Twenty instances, change `TWENTY_BASE_URL` to your domain.
+Restart Claude Desktop. The tools appear automatically.
 
-5. **Restart Claude Desktop** to load the new server.
+## Usage
 
----
+You don't need to memorize tool names or opportunity IDs. Just talk to Claude:
 
-## 💬 Usage
-
-Once configured, you can use natural language to interact with your Twenty CRM:
-
-### 👥 People Management
 ```
-"List the first 10 people in my CRM"
-"Create a new person named John Doe with email john@example.com"
-"Update Sarah's job title to Senior Developer"
-"Find all people working at tech companies"
+"How does my pipeline look?"
+"Can the Legionaries deal advance to 3rd base?"
+"Debrief the Arch of Cinci opportunity"
+"Show me all stalled deals over 14 days"
+"Flag every 2nd-base deal that's missing a compelling reason"
+"Add a boolean field called contractSigned to opportunities"
 ```
 
-### 🏢 Company Management
-```
-"Show me all companies with more than 100 employees"
-"Create a company called Tech Solutions with domain techsolutions.com"
-"Update Acme Corp's annual revenue to $5M"
-```
+Claude finds the right IDs, calls the right tools, and presents the results.
 
-### ✅ Task Management
-```
-"Create a task to follow up with John next Friday"
-"Show me all overdue tasks"
-"Mark the task 'Call client' as completed"
-```
+## Diamond Stages
 
-### 📝 Notes & Search
-```
-"Add a note about my meeting with the client today"
-"Search for any records mentioning 'blockchain'"
-"Find all contacts without LinkedIn profiles"
-```
+| Stage Enum | Base | What's Required |
+|-----------|------|----------------|
+| `HOME_PROSPECT_IDENTIFIED` | Home (start) | — |
+| `OPT1ST_MEETING_BOOKED` | 1st | Meeting booked |
+| `OPT2ND_COMPELLING_REASON` | 2nd | Compelling reason identified + text, pain monetized |
+| `OPT3RD_FULLY_QUALIFIED` | 3rd | All of 2nd + investment conversation, decision maker, criteria, timeline, target date |
+| `HOME_CLOSED_WON` | Home (score) | All of 3rd + deal amount + close date |
 
----
+## Testing
 
-## 🛠️ API Reference
+Run the test suite (read-only, no CRM data modified):
 
-The server provides the following tools:
-
-<details>
-<summary><strong>👥 People Operations</strong></summary>
-
-- `create_person` - Create a new person
-- `get_person` - Get person details by ID
-- `update_person` - Update person information
-- `list_people` - List people with filtering
-- `delete_person` - Delete a person
-
-</details>
-
-<details>
-<summary><strong>🏢 Company Operations</strong></summary>
-
-- `create_company` - Create a new company
-- `get_company` - Get company details by ID
-- `update_company` - Update company information
-- `list_companies` - List companies with filtering
-- `delete_company` - Delete a company
-
-</details>
-
-<details>
-<summary><strong>✅ Task Operations</strong></summary>
-
-- `create_task` - Create a new task
-- `get_task` - Get task details by ID
-- `update_task` - Update task information
-- `list_tasks` - List tasks with filtering
-- `delete_task` - Delete a task
-
-</details>
-
-<details>
-<summary><strong>📝 Note Operations</strong></summary>
-
-- `create_note` - Create a new note
-- `get_note` - Get note details by ID
-- `update_note` - Update note information
-- `list_notes` - List notes with filtering
-- `delete_note` - Delete a note
-
-</details>
-
-<details>
-<summary><strong>🔍 Metadata & Search</strong></summary>
-
-- `get_metadata_objects` - Get all object types and schemas
-- `get_object_metadata` - Get metadata for specific object
-- `search_records` - Search across multiple object types
-
-</details>
-
----
-
-## ⚙️ Configuration
-
-### Environment Variables
-
-- `TWENTY_API_KEY` (required): Your Twenty CRM API key
-- `TWENTY_BASE_URL` (optional): Twenty CRM base URL (defaults to `https://api.twenty.com`)
-
-### Custom Fields
-
-The server automatically discovers and supports custom fields in your Twenty CRM instance. No configuration changes needed when you add new fields.
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-### Development
-
-1. **Clone the repo**:
 ```bash
-git clone https://github.com/mhenry3164/twenty-crm-mcp-server.git
-cd twenty-crm-mcp-server
+TWENTY_API_KEY=your_key TWENTY_BASE_URL=https://crm.truepresence.com node test-tools.js
 ```
 
-2. **Install dependencies**:
+Optionally pass an opportunity ID to test against a specific deal:
+
 ```bash
-npm install
+node test-tools.js b35d493f-6307-43e9-becd-4829c04bbdec
 ```
 
-3. **Set up environment variables**:
-```bash
-cp .env.example .env
-# Edit .env with your API key
-```
+## Environment Variables
 
-4. **Test the server**:
-```bash
-npm test
-```
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `TWENTY_API_KEY` | Yes | — | Your Twenty CRM API key |
+| `TWENTY_BASE_URL` | No | `https://api.twenty.com` | Your CRM instance URL |
 
----
+## License
 
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**Authentication Error**: Verify your API key is correct and has appropriate permissions.
-
-**Connection Failed**: Check that your `TWENTY_BASE_URL` is correct (especially for self-hosted instances).
-
-**Field Not Found**: The server automatically discovers fields. If you're getting field errors, try getting the metadata first: *"Show me the available fields for people"*
-
----
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- [Twenty CRM](https://twenty.com) for providing an excellent open-source CRM
-- [Anthropic](https://anthropic.com) for the Model Context Protocol
-- The MCP community for inspiration and examples
-
----
-
-## 🔗 Links
-
-- [Twenty CRM Documentation](https://twenty.com/developers)
-- [Model Context Protocol Specification](https://modelcontextprotocol.io/)
-- [Claude Desktop](https://claude.ai/desktop)
-
----
-
-<div align="center">
-
-**Made with ❤️ for the open-source community**
-
-*⭐ Star this repo if you find it helpful!*
-
-</div>
+MIT — see original repo for full license text.
